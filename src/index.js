@@ -109,6 +109,25 @@ const SUPPORTED_MODELS = [
     owned_by: "openai"
   }
 ];
+// 模型映射
+const MODELS = {
+  "cursor2api/claude-3-5-sonnet-20241022": "claude-3-5-sonnet-20241022",
+  "cursor2api/claude-3-opus": "claude-3-opus",
+  "cursor2api/claude-3-5-haiku": "claude-3-5-haiku",
+  "cursor2api/claude-3-5-sonnet": "claude-3-5-sonnet",
+  "cursor2api/cursor-small": "cursor-small",
+  "cursor2api/gemini-exp-1206": "gemini-exp-1206",
+  "cursor2api/gemini-2.0-flash-exp": "gemini-2.0-flash-exp",
+  "cursor2api/gemini-2.0-flash-thinking-exp": "gemini-2.0-flash-thinking-exp",
+  "cursor2api/gpt-3.5-turbo": "gpt-3.5-turbo",
+  "cursor2api/gpt-4": "gpt-4",
+  "cursor2api/gpt-4-turbo-2024-04-09": "gpt-4-turbo-2024-04-09",
+  "cursor2api/gpt-4o": "gpt-4o",
+  "cursor2api/gpt-4o-mini": "gpt-4o-mini",
+  "cursor2api/o1-mini": "o1-mini",
+  "cursor2api/o1-preview": "o1-preview"
+}
+
 
 // 修改根路由
 app.get('/', (req, res) => {
@@ -201,13 +220,14 @@ app.post('/api/v1/chat/completions', async (req, res) => {
       });
     }
 
-    const hexData = await stringToHex(messages, model);
+    const hexData = await stringToHex(messages, MODELS[model]);
 
     // 生成checksum
     const checksum = req.headers['x-cursor-checksum'] 
                   ?? process.env['X_CURSOR_CHECKSUM']
                   ?? generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
-    console.log("checksum is" + checksum)
+    // console.log("checksum is" + checksum)
+    console.log("model is " + MODELS[model])
 
     const response = await fetch('https://api2.cursor.sh/aiserver.v1.AiService/StreamChat', {
       method: 'POST',
