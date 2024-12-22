@@ -275,7 +275,7 @@ app.post('/api/v1/chat/completions', async (req, res) => {
     const checksum = req.headers['x-cursor-checksum'] 
                   ?? process.env['X_CURSOR_CHECKSUM']
                   ?? generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
-    console.log("checksum is" + checksum)
+    // console.log("checksum is" + checksum)
     console.log("model is " + MODELS[model])
     console.log("model is " + model)
 
