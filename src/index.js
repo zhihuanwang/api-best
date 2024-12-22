@@ -126,10 +126,10 @@ app.get('/', (req, res) => {
     },
     models: SUPPORTED_MODELS.map(model => model.id),
     endpoints: [
-      '/v1/chat/completions',
-      '/v1/models', 
-      '/checksum',
-      '/env-checksum'
+      '/api/v1/chat/completions',
+      '/api/v1/models', 
+      '/api/api/checksum',
+      '/api/env-checksum'
     ]
   });
 });
@@ -147,14 +147,14 @@ app.use((req, res, next) => {
 });
 
 // 添加新的路由处理模型列表请求
-app.get('/v1/models', (req, res) => {
+app.get('/api/v1/models', (req, res) => {
   res.json({
     object: "list",
     data: SUPPORTED_MODELS
   });
 });
 
-app.get('/checksum', (req, res) => {
+app.get('/api/checksum', (req, res) => {
   const checksum = generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
   res.json({
     checksum
@@ -162,7 +162,7 @@ app.get('/checksum', (req, res) => {
 });
 
 // 添加获取环境变量checksum的接口
-app.get('/env-checksum', (req, res) => {
+app.get('/api/env-checksum', (req, res) => {
   const envChecksum = process.env['X_CURSOR_CHECKSUM'];
   res.json({
     status: envChecksum ? 'configured' : 'not_configured',
@@ -170,7 +170,7 @@ app.get('/env-checksum', (req, res) => {
   });
 });
 
-app.post('/v1/chat/completions', async (req, res) => {
+app.post('/api/v1/chat/completions', async (req, res) => {
   // o1开头的模型，不支持流式输出
   if (req.body.model.startsWith('o1-') && req.body.stream) {
     return res.status(400).json({
