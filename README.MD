@@ -1,4 +1,5 @@
 # cursor-api
+origin repo: https://github.com/906051999/cursor-api
 
 ## 获取key
 
