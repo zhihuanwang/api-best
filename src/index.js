@@ -19,91 +19,91 @@ app.use(express.urlencoded({ extended: true }));
 // 添加支持的模型列表
 const SUPPORTED_MODELS = [
   {
-    id: "claude-3-5-sonnet-20241022",
+    id: "cursor2api/claude-3-5-sonnet-20241022",
     created: 1706571819,
     object: "model",
     owned_by: "anthropic"
   },
   {
-    id: "claude-3-opus",
+    id: "cursor2api/claude-3-opus",
     created: 1706571819,
     object: "model",
     owned_by: "anthropic"
   },
   {
-    id: "claude-3-5-haiku",
+    id: "cursor2api/claude-3-5-haiku",
     created: 1706571819,
     object: "model",
     owned_by: "anthropic"
   },
   {
-    id: "claude-3-5-sonnet",
+    id: "cursor2api/claude-3-5-sonnet",
     created: 1706571819,
     object: "model",
     owned_by: "anthropic"
   },
   {
-    id: "cursor-small",
+    id: "cursor2api/cursor-small",
     created: 1706571819,
     object: "model",
     owned_by: "cursor"
   },
   {
-    id: "gemini-exp-1206",
+    id: "cursor2api/gemini-exp-1206",
     created: 1706571819,
     object: "model",
     owned_by: "google"
   },
   {
-    id: "gemini-2.0-flash-exp",
+    id: "cursor2api/gemini-2.0-flash-exp",
     created: 1706571819,
     object: "model",
     owned_by: "google"
   },
   {
-    id: "gemini-2.0-flash-thinking-exp",
+    id: "cursor2api/gemini-2.0-flash-thinking-exp",
     created: 1706571819,
     object: "model",
     owned_by: "google"
   },
   {
-    id: "gpt-3.5-turbo",
+    id: "cursor2api/gpt-3.5-turbo",
     created: 1706571819,
     object: "model",
     owned_by: "openai"
   },
   {
-    id: "gpt-4",
+    id: "cursor2api/gpt-4",
     created: 1706571819,
     object: "model",
     owned_by: "openai"
   },
   {
-    id: "gpt-4-turbo-2024-04-09",
+    id: "cursor2api/gpt-4-turbo-2024-04-09",
     created: 1706571819,
     object: "model",
     owned_by: "openai"
   },
   {
-    id: "gpt-4o",
+    id: "cursor2api/gpt-4o",
     created: 1706571819,
     object: "model",
     owned_by: "openai"
   },
   {
-    id: "gpt-4o-mini",
+    id: "cursor2api/gpt-4o-mini",
     created: 1706571819,
     object: "model",
     owned_by: "openai"
   },
   {
-    id: "o1-mini",
+    id: "cursor2api/o1-mini",
     created: 1706571819,
     object: "model",
     owned_by: "openai"
   },
   {
-    id: "o1-preview",
+    id: "cursor2api/o1-preview",
     created: 1706571819,
     object: "model",
     owned_by: "openai"
