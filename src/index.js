@@ -12,6 +12,53 @@ const version = '1.0.0';
 let totalRequests = 0;
 let activeRequests = 0;
 
+// 认证中间件
+const authMiddleware = (req, res, next) => {
+  try {
+    // 获取 Authorization header
+    const authHeader = req.headers.authorization;
+
+    // 检查 header 是否存在
+    if (!authHeader) {
+      return res.status(401).json({
+        message: 'Authorization header missing'
+      });
+    }
+
+    // Bearer Token 格式检查
+    if (!authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        message: 'Invalid authorization format'
+      });
+    }
+
+    // 获取 token
+    const token = authHeader.split(' ')[1];
+
+    // 验证 token
+    if (!isValidToken(token)) {
+      return res.status(401).json({
+        message: 'Invalid token'
+      });
+    }
+
+    // 验证通过,继续处理请求
+    next();
+
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Authorization failed'
+    });
+  }
+};
+
+// token 验证逻辑
+function isValidToken(token) {
+  return process.env['AUTH_TOKEN'] === token;
+}
+
+// 应用中间件到所有路由
+app.use(authMiddleware);
 // 中间件配置
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -200,7 +247,8 @@ app.post('/api/v1/chat/completions', async (req, res) => {
   let currentKeyIndex = 0;
   try {
     const { model, messages, stream = false } = req.body;
-    let authToken = req.headers.authorization?.replace('Bearer ', '');
+    // let authToken = req.headers.authorization?.replace('Bearer ', '');
+    let authToken = process.env['WORK_OS_CURSOR_SESSION_TOKEN'];
     // 处理逗号分隔的密钥
     const keys = authToken.split(',').map((key) => key.trim());
     if (keys.length > 0) {
@@ -210,6 +258,7 @@ app.post('/api/v1/chat/completions', async (req, res) => {
       }
       // 使用当前索引获取密钥
       authToken = keys[currentKeyIndex];
+      // todo 等这个session token用量使用完毕 currentKeyIndex ++
     }
     if (authToken && authToken.includes('%3A%3A')) {
       authToken = authToken.split('%3A%3A')[1];
@@ -226,8 +275,9 @@ app.post('/api/v1/chat/completions', async (req, res) => {
     const checksum = req.headers['x-cursor-checksum'] 
                   ?? process.env['X_CURSOR_CHECKSUM']
                   ?? generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
-    // console.log("checksum is" + checksum)
+    console.log("checksum is" + checksum)
     console.log("model is " + MODELS[model])
+    console.log("model is " + model)
 
     const response = await fetch('https://api2.cursor.sh/aiserver.v1.AiService/StreamChat', {
       method: 'POST',
