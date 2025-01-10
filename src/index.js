@@ -12,6 +12,7 @@ const version = '1.0.0';
 let totalRequests = 0;
 let activeRequests = 0;
 let authTokenAndCheckSum = null;
+let currentKeyIndex = 0;
 try {
   authTokenAndCheckSum = JSON.parse(process.env.WORK_OS_CURSOR_SESSION_TOKEN)
 }catch (e) {
@@ -251,7 +252,7 @@ app.post('/api/v1/chat/completions', async (req, res) => {
     });
   }
 
-  let currentKeyIndex = 0;
+
   try {
     const { model, messages, stream = false } = req.body;
     let authToken = req.headers.authorization?.replace('Bearer ', '');
