@@ -11,6 +11,13 @@ const startTime = new Date();
 const version = '1.0.0';
 let totalRequests = 0;
 let activeRequests = 0;
+let authTokenAndCheckSum = null;
+try {
+  authTokenAndCheckSum = JSON.parse(process.env.WORK_OS_CURSOR_SESSION_TOKEN)
+}catch (e) {
+  console.log("json 格式错误")
+}
+
 
 // 认证中间件
 const authMiddleware = (req, res, next) => {
@@ -247,18 +254,26 @@ app.post('/api/v1/chat/completions', async (req, res) => {
   let currentKeyIndex = 0;
   try {
     const { model, messages, stream = false } = req.body;
-    // let authToken = req.headers.authorization?.replace('Bearer ', '');
-    let authToken = process.env['WORK_OS_CURSOR_SESSION_TOKEN'];
+    let authToken = req.headers.authorization?.replace('Bearer ', '');
+    // let authToken = process.env['WORK_OS_CURSOR_SESSION_TOKEN'];
     // 处理逗号分隔的密钥
-    const keys = authToken.split(',').map((key) => key.trim());
-    if (keys.length > 0) {
-      // 确保 currentKeyIndex 不会越界
-      if (currentKeyIndex >= keys.length) {
-        currentKeyIndex = 0;
-      }
-      // 使用当前索引获取密钥
-      authToken = keys[currentKeyIndex];
-      // todo 等这个session token用量使用完毕 currentKeyIndex ++
+    // const keys = authToken.split(',').map((key) => key.trim());
+    // if (keys.length > 0) {
+    //   // 确保 currentKeyIndex 不会越界
+    //   if (currentKeyIndex >= keys.length) {
+    //     currentKeyIndex = 0;
+    //   }
+    //   // 使用当前索引获取密钥
+    //   authToken = keys[currentKeyIndex];
+    //   // todo 等这个session token用量使用完毕 currentKeyIndex ++
+    // }
+    let checksum = "";
+    if (authTokenAndCheckSum.length > 0){
+      currentKeyIndex = currentKeyIndex % authTokenAndCheckSum.length;
+      authToken = authTokenAndCheckSum[currentKeyIndex].token;
+      checksum = authTokenAndCheckSum[currentKeyIndex].checksum;
+      console.log(`Using token index: ${currentKeyIndex}`);
+      currentKeyIndex ++;
     }
     if (authToken && authToken.includes('%3A%3A')) {
       authToken = authToken.split('%3A%3A')[1];
@@ -272,10 +287,10 @@ app.post('/api/v1/chat/completions', async (req, res) => {
     const hexData = await stringToHex(messages, MODELS[model]);
 
     // 生成checksum
-    const checksum = req.headers['x-cursor-checksum'] 
-                  ?? process.env['X_CURSOR_CHECKSUM']
-                  ?? generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
-    // console.log("checksum is" + checksum)
+    // const checksum = req.headers['x-cursor-checksum']
+    //               ?? process.env['X_CURSOR_CHECKSUM']
+    //               ?? generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
+    console.log("checksum is" + checksum)
     console.log("model is " + MODELS[model])
     console.log("model is " + model)
 
