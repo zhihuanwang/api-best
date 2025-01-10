@@ -4,6 +4,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { stringToHex, chunkToUtf8String, getRandomIDPro } = require('./utils.js');
 const { generateCursorChecksum, generateHashed64Hex } = require('./generate.js');
+const { CursorAPI } = require('./usage.js')
 const app = express();
 
 // 在文件开头附近添加
@@ -243,7 +244,46 @@ app.get('/api/env-checksum', (req, res) => {
     checksum: envChecksum || null
   });
 });
+app.get('/api/usage', async (req, res) => {
+  try {
+    // 首先检查数组是否有内容
+    if (!authTokenAndCheckSum || authTokenAndCheckSum.length === 0) {
+      return res.json([]);
+    }
 
+    let usage = [];
+    // 修正循环条件
+    for (let i = 0; i < authTokenAndCheckSum.length; i++) {
+      const currentItem = authTokenAndCheckSum[i];
+
+      // 检查当前项及其token是否存在
+      if (currentItem && currentItem.token && currentItem.token.includes('%3A%3A')) {
+        const usageArr = currentItem.token.split('%3A%3A');
+
+        if (usageArr.length === 2) {
+          try {
+            const cursor = new CursorAPI(usageArr[1]);
+            const status = await cursor.getUsage();
+
+            usage.push({
+              user: usageArr[0],
+              status: status,
+            });
+          } catch (error) {
+            console.error(`Error processing item ${i}:`, error);
+            // 继续处理下一项
+
+          }
+        }
+      }
+    }
+
+    res.json(usage);
+  } catch (error) {
+    console.error('Error in /api/usage:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 app.post('/api/v1/chat/completions', async (req, res) => {
   // o1开头的模型，不支持流式输出
   if (req.body.model.startsWith('o1-') && req.body.stream) {
