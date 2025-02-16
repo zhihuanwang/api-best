@@ -204,7 +204,8 @@ app.get('/', (req, res) => {
       '/api/v1/chat/completions',
       '/api/v1/models', 
       '/api/api/checksum',
-      '/api/env-checksum'
+      '/api/env-checksum',
+      '/api/v1/update-checksum'
     ]
   });
 });
@@ -234,6 +235,13 @@ app.get('/api/checksum', (req, res) => {
   res.json({
     checksum
   });
+});
+app.post('/api/v1/update-checksum', (req, res) => {
+  process.env['X_CURSOR_CHECKSUM'] = generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
+  res.json({
+    status: 'ok',
+    checksum: process.env['X_CURSOR_CHECKSUM']
+  })
 });
 
 // 添加获取环境变量checksum的接口
