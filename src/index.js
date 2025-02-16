@@ -237,10 +237,16 @@ app.get('/api/checksum', (req, res) => {
   });
 });
 app.post('/api/v1/update-checksum', (req, res) => {
-  process.env['X_CURSOR_CHECKSUM'] = generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
+  if (!authTokenAndCheckSum || authTokenAndCheckSum.length === 0) {
+    return res.json([]);
+  }
+  for (let i = 0; i < authTokenAndCheckSum.length; i++) {
+    const currentItem = authTokenAndCheckSum[i];
+    currentItem.checksum = generateCursorChecksum(generateHashed64Hex(), generateHashed64Hex());
+  }
   res.json({
     status: 'ok',
-    checksum: process.env['X_CURSOR_CHECKSUM']
+    checksum: authTokenAndCheckSum
   })
 });
 
